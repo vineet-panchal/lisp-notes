@@ -49,4 +49,4 @@
       (print "Insufficient Funds"))
   (if (and (< amount 10000) (> amount 0))
       (setf *balance* (- *balance* amount)))
-  *balance*)
+  )

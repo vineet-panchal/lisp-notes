@@ -29,7 +29,7 @@
 ; LET special form
 (let ((quatro 4)) (* quatro quatro)) ; ==> 16
 (let ((x 3) (y 1)) (+ (* x y) x)) ; ==> 16
-(let ((x 3) (y (* x x))) (+ x y))
+(let* ((x 3) (y (* x x))) (+ x y))
 (let* (
         (a 2) (b 4) (c -1) (delta (- (* b b) (* 4 a c)))
         (res (sqrt delta)))

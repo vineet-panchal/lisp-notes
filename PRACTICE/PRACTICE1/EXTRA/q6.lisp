@@ -1,0 +1,10 @@
+; given an array and an integer n, output a list containing all numbers in the array that are less than n
+(defun less-than (arr n)
+  (let ((result (make-list 0)))
+    (dotimes (i (length arr) (reverse result))
+      (when (< (aref arr i) n)
+        (setq result (cons (aref arr i) result))
+        )
+      )
+    )
+  )

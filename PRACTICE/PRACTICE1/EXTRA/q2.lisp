@@ -1,0 +1,16 @@
+; output the sum of all numbers in an array that is greater than n
+(defun numbers-greater (arr n)
+  (let ((sum 0))
+    (dotimes (i (length arr) sum)
+      (when (> (aref arr i) n)
+        (setf sum (+ sum (aref arr i))))
+      )))
+
+(defun numbers-greater-do (arr n)
+  (do ((i 0 (+ i 1)) (sum 0))
+      ((= i (length arr)) sum)
+    (when (> (aref arr i) n)
+      (setf sum (+ sum (aref arr i)))
+      )
+      )
+  )

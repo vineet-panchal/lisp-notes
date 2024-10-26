@@ -1,0 +1,165 @@
+; Review of Parts 1-5
+
+; Time Complexity ==> Metric used to evaluate and compare algorithms
+
+; Big-O Notation
+; O(n!) ==> Factorial
+; O(2^n) ==> Exponential
+; O(n^#) ==> Polynomial
+; O(n log n) ==> Log-Linear
+
+; O(n) ==> Linear
+; the time scales linearly with the # of elements in the array
+; Ex: Linear search checks every element in order. Every new
+    ; element in the array increases the duration by constant time
+
+; O(log n) ==> Logarithmic
+; algorithms that split the work in half each iteration
+; Ex: Binary search cuts the array in hald with each iteration. It
+    ; drastically reduces the # of elements that need to be visited
+    ; each iteration.
+
+; O(1) ==> Constant
+; regardless of the # of elements in the data structure, the
+; algorithm takes the same amount of time to complete.
+; Ex: retrieving data at an index: arr[12]
+
+
+
+; Code To Big-O
+
+; Ex 1:
+; (setf a 1)
+; (setf b 2)
+; (setf c 3)
+; (setf d 4)
+; T(n) = 1 + 1 + 1 + 1 = 4 = O(4)
+; Time Complexity = O(1)
+
+; Ex 2:
+; (dotimes (x n)
+;   (setf a 1)
+;   (setf b 2)
+;   (setf c 3)
+;   (setf d 4))
+; T(n) = {n - 4 | x = 0} ∑ (1 + 1 + 1 + 1) = n(1)
+; Time Complexity = O(n)
+
+; Ex 3:
+; (dotimes (x n)
+;   (dotimes (y n)
+;     (setf 1)))
+; T(n) = {n - 1 | x = 0} ∑ ({n - 1 | y = 0} ∑ (1))
+; T(n) = {n - 1 | x = 0} ∑ (n)
+; Time Complexity = O(n^2)
+
+; Ex 4:
+; (do ((x 1 (* x 5))
+;     ((>= x n))
+;   (setf a 1))
+; T(n) =
+
+
+
+; Linear Search ==> O(n)
+; ==> searches over all the elements in a list starting with the first
+(defun linear-search (n lst)
+  (dolist (i lst)
+    (when (= (nth i lst) n)
+      (return i))))
+; (linear-search 1 '(5 4 3 2 1)) ==> 4
+
+
+
+; Binary Search ==> O(log n)
+; ==> given a sorted array, repeatedly divide the array in 2
+; ==> discard the half without the element each iteration
+(defun bin-search (val vec &optional (pos 0))
+; the function takes two arguments: val - the target value, vec - the sorted vector
+; it also takes in one optional argument that is set to 0, which keeps track of the current index in the vector
+  "If val is in vec, return pos, i.e, the position of val in the original vector; otherwise, return NIL"
+  (if (> (length vec) 1) ; if the length of the vector is greater than 1, proceed with the algorithm
+      (let* ((midpt (floor (length vec) 2)) ; set midpt to the midpoint index using floor division
+             (midel (aref vec midpt))) ; set midel to the value of the midpoint index
+        (cond ((< midel val) ; condition 1: check if the middle element is less than the target value
+               (bin-search val (rtl:slice vec midpt) (+ pos midpt)))
+        ; recursively call the function to the right half of the vector, from midpt onward
+              ((> midel val) ; condition 2: check if the middle element is greater than the target value
+               (bin-search val (rtl:slice vec 0 midpt) pos))
+        ; recursively call the function to the left hald of the vector, from start to midpt
+              (t (+ pos midpt)))) ; default: target value is equal to midel, return the current position
+      (when (= (aref vec 0) val) ; if the length of the vector is 1, do not perform anymore division
+        pos))) ; if the target is found, return the current index, else return NIL
+; (bin-search 2 #(1 2 3 4 5 6)) ==> 1
+
+
+
+; Selection Sort ==> O(n^2)
+; ==> look through the entire list for the smallest element and swap it with the first element. Move onto the next.
+; ==> it moves left to right as it builds the sorted prefix to the left of the current element
+; ==> in one pass, it finds the smallest or largest element to the right of the current element and then swaps them
+(defun selection-sort (vec comp)
+; the function takes two arguments: vec - the vector to be sorted, comp - an comparison function
+  "Sorts vec using comp, a function"
+  (dotimes (cur (1- (length vec)))
+  ; loop over all elements of the vector, except the last element since it will be sorted later
+  ; set cur to be the current index ranging from 0 to (length vec) - 1
+    (let ((best (aref vec cur)) ; initialize best to the current element in the vector
+          (idx cur)) ; initialize idx to the current index
+      (do ((j (1+ cur) (1+ j))) ; j is initially cur+1 (the next element) and increments by 1 each iteration
+          ((= j (length vec))) ; let j loop over all elements until it reaches the length of the vector
+        (when (funcall comp (aref vec j) best) ; call the comparison function "comp" on the element at index j and best
+          (:= best (aref vec j)
+              idx j))) ; if the condition is true, update best to the element at index j and idx is set to j
+           ; it keeps track of the best element found in the unsorted part of the array
+      (rotatef (aref vec cur) (aref vec idx)))) ; swap the best element with the current element at index "cur"
+  vec) ; return the vector
+; (selection-sort #(3 1 0 7 8 2) #'<) ==> #(0 1 2 3 7 8)
+; (selection-sort #(3 1 0 7 8 2) #'>) ==> #(8 7 3 2 1 0)
+
+
+
+; Insertion Sort ==> O(n^2)
+; ==> if the next element is less than your current element, repeatedly swap 
+; it to the left until is is in the current position
+; ==> if the next element is greater than your current element, continue
+; moving to the right to check the next element.
+(defun insertion-sort (vec comp)
+; the function takes in two arguments: vec - the vector to be sorted
+; comp - a comparison function
+  (dotimes (i (1- (length vec)))
+  ; the outer loop iterates from the start of the vector to the second last element
+    (do ((j i (1- j)))
+        ((minusp j))
+    ; start an inner loop, with index j, initially set to i
+    ; in each iteration, j is decremented by 1 '(1- j)'
+    ; stop the loop when j is negative '(minusp j)'
+      (if (funcall comp (aref vec (1+ j)) (aref vec j))
+      ; use the comparison function to check if the neighbour j should be before or after
+          (rotatef (aref vec (1+ j)) (aref vec j))
+          ; swap j and its neighbour
+          (return))))
+  vec) ; return the vector
+; (insertion-sort #(7 8 2 1 3 4) #'<) ==> #(1 2 3 4 7 8)
+; (insertion-sort #(7 8 2 1 3 4) #'>) ==> #(8 7 4 3 2 1)
+
+
+
+; Bubble Sort ==> O(n^2)
+; ==> iterate through the elements, swapping with their neighbour if two elements are out of order
+; ==> it puts the largest element to the end of the list with each iteration
+(defun bubble-sort (arr)
+; the function takes in one argument: arr - the array to be sorted
+  (let ((len (length arr)))
+  ; define the length of the array to an array, used to decrement later
+    (dotimes (i (- len arr))
+    ; loop through the start of the list to the variable length defined earlier
+      (dotimes (j (- len i 1))
+      ; loop j to length of the array - i - 1
+        (if (> (aref arr j) (aref arr (1+ j)))
+        ; if the element at index j is greater than the element at index j+1
+          (rotatef (aref arr (1+ j)) (aref arr j))))) ; swap the two elements
+  arr)) ; return the sorted array
+; (bubble-sort #(2 4 3 1 5 8 7 6))
+
+

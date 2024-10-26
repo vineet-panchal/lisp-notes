@@ -124,7 +124,7 @@
 ; ==> if the next element is less than your current element, repeatedly swap 
 ; it to the left until is is in the current position
 ; ==> if the next element is greater than your current element, continue
-; moving to the right to check the next element.
+; moving to the right to check the next element.  
 (defun insertion-sort (vec comp)
 ; the function takes in two arguments: vec - the vector to be sorted
 ; comp - a comparison function
@@ -150,7 +150,7 @@
 ; iterate through elements, swapping with the neighbour if two elements are out of order.
 ; it puts the largest elements to the end of the list with each iteration.
 (defun bubble-sort (vec comp)
-; the function takes in one argument: arr - the array to be sorted
+; the function takes in two argument: arr - the array to be sorted and comp - an comparison function
   "Sorts the vector `vec` in-place using the bubble sort algorithm and
    the provided comparison function `comp`. Returns the sorted vector."
   (let ((n (length vec)))
@@ -191,17 +191,17 @@
       ; If the list is empty or contains only one element, it is already sorted.
       list
     ; Otherwise, split the list into two halves and sort each half recursively.
-    (let* ((middle (/ (length list) 2))
-           (left (subseq list 0 middle))
-           (right (subseq list middle)))
+    (let* ((middle (/ (length list) 2) ; set middle to be the middle index
+           (left (subseq list 0 middle)) ; set left to be the sublist from 0 to middle
+           (right (subseq list middle))) ; set right to be the sublist from middle onward
       ;; Recursively sort both halves and then merge them.
-      (merge-sorted-lists (merge-sort left comp) (merge-sort right comp) comp)))) 
+      (merge-sorted-lists (merge-sort left comp) (merge-sort right comp) comp)))))
       ; call merge-sorted-lists to sort the two lists into one resulting list
 
 
 
 ; Quick Sort ==> O(n log n)
-; ==> pick an element to be the "pivot". Teh pivot represents a known value, where
+; ==> pick an element to be the "pivot". The pivot represents a known value, where
 ; ==> everything to the left of the pivot will be less than the pivot and
 ; ==> everything to the right of the pivot will be greater than the pivot
 (defun quicksort (vec comp)
@@ -271,7 +271,7 @@
 ; POP ==> when removing(popping) from the stack, decrement the index, then delete the element of that position
 
 ; Queues In LL (FIFO)
-; ENQUEUE ==> when adding to the queue, remove the first node and make the front reference point to whatever it was
+; ENQUEUE ==> when adding to the queue, add to the first node and make the front reference point to whatever it was
 ;             pointing to.
 ; DEQUEUE ==> when removing from the queue, remove the last node and make the rear reference point to whatever it
 ;             was pointing to.
@@ -318,14 +318,12 @@
 ; 3. Must call itself
 
 ; ==> identify the repeated process and determine the smallest amount of work for the recursive call
-; ==> tbe base case is typically an input that doesn't fallow the function's behaviour
+; ==> the base case is typically an input that doesn't allow the function's behaviour
 
 (defun factorial (x)
-  (if (= x 0)
-    (return 1)
-  )
-  (return (* x (factorial (x - 1))))
-)
+  (if (= x 0) ; base case
+    (return 1))
+  (return (* x (factorial (x - 1))))) ; recursive call
 
 ; Tail Recursion
 ; ==> a function is tail recursive when the last exxecuted statement in the function is the recursive call

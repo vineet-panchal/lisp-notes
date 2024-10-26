@@ -15,7 +15,7 @@
 
 ; O(log n) ==> Logarithmic
 ; algorithms that split the work in half each iteration
-; Ex: Binary search cuts the array in hald with each iteration. It
+; Ex: Binary search cuts the array in half with each iteration. It
     ; drastically reduces the # of elements that need to be visited
     ; each iteration.
 
@@ -42,7 +42,7 @@
 ;   (setf b 2)
 ;   (setf c 3)
 ;   (setf d 4))
-; T(n) = {n - 4 | x = 0} ∑ (1 + 1 + 1 + 1) = n(1)
+; T(n) = {n - 1 | x = 0} ∑ (1 + 1 + 1 + 1) = n(1)
 ; Time Complexity = O(n)
 
 ; Ex 3:
@@ -57,7 +57,8 @@
 ; (do ((x 1 (* x 5))
 ;     ((>= x n))
 ;   (setf a 1))
-; T(n) =
+; T(n) = {log5^n-1 | p = 0} ∑ (1) = (log5^n)
+; Time Complexity = O(log n)
 
 
 

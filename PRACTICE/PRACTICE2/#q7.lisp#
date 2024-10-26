@@ -1,0 +1,17 @@
+; Review 2 Practice - Question 7
+; Write a function FLATTEN-LIST that takes a nested list as an input and returns as a flattened list. The nested list may contain sublists at various depths. The result should be a single-level list containing all the elements in the order they were encountered in the original list. For example,
+; CL-USER> (flatten-list '(1 2 "hello" 3 4 4.0 (5 6) 7 (8 'hi 9 (10 11 (12) "bye" (13 14)) 15 (16)) 17 'goodbye ((((18))) 19) 20))
+; ==> (1 2 "hello" 3 4 4.0 5 6 7 8 QUOTE HI 9 10 11 12 "bye" 13 14 15 16 17 QUOTE GOODBYE 18 19 20)
+
+;; this is the function that will be called to run the tail-recursive function, because the result needs to be reversed
+(defun flatten-list (lst) (reverse (flatten-list-helper lst)))
+
+(defun flatten-list-helper (lst &optional (acc '()))
+  ;; base case: returns the accumulator when the list is empty
+  (cond ((null lst) acc)
+        ; if the first element of the list is not a list, call the function with the rest of the list and add the first element to the front of the acc
+        ((not (typep (car lst) 'list)) (flatten-list-helper (cdr lst) (cons (car lst) acc)))
+        ; the first element of the list is a list, call the function with the rest of the list and let the accumulator be the result of our function with the first element and the current accumulator
+        (t (flatten-list-helper (cdr lst) (flatten-list-helper (car lst) acc)))))
+
+

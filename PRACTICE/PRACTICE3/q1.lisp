@@ -13,9 +13,17 @@
         (t (merge-sorted-listsTR lst1 (cdr lst2) comp (cons (car lst2) acc)))))
 
 (defun merge-sorted-listsR (lst1 lst2 comp)
-  (let ((result '()))
+  (let ((result '())) ; define result to be an empty list
     (cond ((and (null lst1) (null lst2)) (reverse result))
+          ; BASE CASE: if list1 and list2 are null, return the reverse of result
           ((null lst1) (cons (car lst2) (merge-sorted-listsR lst1 (cdr lst2) comp)))
+          ; CONDITION 1: if list1 is null, add the first element of list2
+          ; to the recursive call of the rest of list2
           ((null lst2) (cons (car lst1) (merge-sorted-listsR (cdr lst1) lst2 comp)))
+          ; CONDITION 2: if list2 is null, add the first element of list1
+          ; to the recursive call of the rest of list1 
           ((funcall comp (car lst1) (car lst2)) (cons (car lst1) (merge-sorted-listsR (cdr lst1) lst2 comp)))
+          ; CONDITION 3: call the comparison function on the first element of list1 and list2, if true,
+          ; then add the first element of list1 to the recursive call of the rest of list1
           (t (cons (car lst2) (merge-sorted-listsR lst1 (cdr lst2) comp))))))
+          ; DEFAULT: add the first element of list2 to the recursive call of the rest of list2

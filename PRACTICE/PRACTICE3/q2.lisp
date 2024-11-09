@@ -11,7 +11,13 @@
         (t (sum-deep-listTR (cdr lst) (+ acc (sum-deep-listTR (car lst)))))))
 
 (defun sum-deep-listR (lst)
-  (let ((result 0))
+  (let ((result 0)) ; define result to 0
     (cond ((null lst) result)
+          ; BASE CASE: if list is null, return result
           ((not (typep (car lst) 'list)) (+ (+ result (car lst)) (sum-deep-listR (cdr lst))))
+          ; CONDITION 1: if the first element of the list is not type list, then
+          ; add the updated result (add the first element) to the recursive call of the rest of the list
           (t (+ (+ result (sum-deep-listR (car lst))) (sum-deep-listR (cdr lst)))))))
+          ; DEFAULT: if the first element is of type list
+          ; add the updated result (add the recursive call of first element)
+          ; to the recursive call of the rest of the list

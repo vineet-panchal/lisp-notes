@@ -99,10 +99,30 @@
 ; notice that the binary tree is preserved
 
 ; Ex: Splay the node containing 3.
-;       9                   9                         3          
-;      / \                 / \                         /\  
-;     7  10               3  10                        1  9      
-;    / \      LT-Rot     / \       LT-Rot                   /\
-;   3   8     =====>    1   7      =====>                7 10    
-;  / \                     / \                       /\                       
-; 1   4                   4  8                      4 8          
+;       9                   9                  _3_          
+;      / \                 / \                 / \  
+;     7  10              _3_ 10               1  9      
+;    / \      LT-Rot     / \       LT-Rot       / \
+;  _3_  8     =====>    1   7      =====>      7  10    
+;  / \                     / \                / \                       
+; 1   4                   4  8               4  8          
+
+; Splay the BST below, splay the node containing node 8.
+;         9
+;       /   \
+;      6    10
+;    /   \
+;   3    _8_
+;  / \   /
+; 1  4  7
+
+;          9                    9                  _8_          
+;        /   \                 / \                 / \  
+;       6    10              _8_ 10               6   9      
+;     /   \       RT-Rot     /        RT-Rot     / \   \
+;   3     _8_     =====>    6         =====>    3  7   10    
+;  / \    /                / \                 / \                       
+; 1   4  7                3  7                1  4     
+;                        /\
+;                       1 4
+

@@ -51,7 +51,7 @@
         (format stream " ~{~@T~A~}~%" ids) ; prints items of list IDS separated by a tab
         (dolist (id1 ids)
           (let ((node (gethash id1 (nodes graph)))
-                (format stream "~A" id1)
+                (format stream "~A" id1)                                                                            
                 (dolist (id2 ids)
                   (format stream "~@T~:[ ~;x~]" ; if the argument is non-nil prints "x"
                           (find id2 (node-edges node) :key 'edge-dst)))

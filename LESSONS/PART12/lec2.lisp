@@ -56,3 +56,12 @@
 ; Adjacency Matrix:
 ; => used for representing small graphs G = (V, E) that have many edges
 ; => not very efficient to represent sparse data, i.e., |E| << |V|^2
+
+;     V0  V1  V2  V3  V4  V5
+; V0      5               2
+; V1          4
+; V2              9
+; V3                  7   3
+; V4
+; V5          1       8
+

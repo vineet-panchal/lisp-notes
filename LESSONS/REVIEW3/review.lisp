@@ -286,31 +286,39 @@
 ;    where the current node is
 
 (defun bst-remove (obj bst comp)
-  (when bst
-    (let ((key (key bst))
-          (left (lc bst))
-          (right (rc bst)))
+  (when bst ; when there is a valid binary tree as input
+    (let ((key (key bst)) ; let key be the key of the binary tree
+          (left (lc bst)) ; let left be the left child of the binary tree
+          (right (rc bst))) ; let right be the right child of the binary tree
       (cond ((funcall comp obj key) (make-bNode :key key :lc (bst-remove obj left comp) :rc right))
+            ; if obj compares with key, create a binary tree with the key being the key
+            ; the left child being the recursive call of obj left and comp, and the right child being the right child
             ((funcall comp key obj) (make-bNode :key key :lc left :rc (bst-remove obj right comp)))
-            (t (bst-join left right comp))))))
+            ; if key compares with obj, create a binary tree with the key being the key, the left child being the left child,
+            ; and the right child being the recursive call of obj right comp
+            (t (bst-join left right comp)))))) ; else join the left child and right using the comparator
 
 (defun bst-join (left right comp)
   "joins two binary search trees."
-  (cond ((null left) right)
-        ((null right) left)
-        ((zerop (random 2))
-         (let ((root (key (bst-max left))))
+  (cond ((null left) right) ; if the left subtree is null, return the right subtree
+        ((null right) left) ; if the right subtree is null, return the left subtree
+        ((zerop (random 2)) ; random choice for new root
+         (let ((root (key (bst-max left)))) ; let the root be the maximum node of the left subtree
            (make-bNode :key root :lc (bst-remove root left comp) :rc right)))
-        (t (let ((root (key (bst-min right))))
+           ; create a binary tree with the key being the root, the left child being the bst-remove function of the root, left subtree,
+           ; and comp, and the right child being the right subtree
+        (t (let ((root (key (bst-min right)))) ; let root be the minimum node of the right subtree
              (make-bNode :key root :lc left :rc (bst-remove root right comp))))))
+             ; create a binary tree with the key being the root, the left child being the left subtree
+             ; and the right child being the bst-remove function of the root, right subtree, and comp
 
 ; Minimum/Maximum
 (defun bst-min (bst)
-  (if (not (null bst))
-      (or (bst-min (lc bst)) bst)))
+  (if (not (null bst)) ; if given binary tree is not null
+      (or (bst-min (lc bst)) bst))) ; recursively call the left subtree or return the binary tree, if there is no more left child
 
 (defun bst-min2 (bst)
-  (and bst
+  (and bst 
        (or (bst-min2 (lc bst)) bst)))
 
 (defun bst-min3 (bst)
@@ -319,8 +327,8 @@
         (t (bst-min3 (lc bst)))))
 
 (defun bst-max (bst)
-  (if (not (null bst))
-      (or (bst-max (rc bst)) bst)))
+  (if (not (null bst)) ; if the given binary tree is not null
+      (or (bst-max (rc bst)) bst))) ; recursively call the right subtree or return the binary tree, if there is no more right child
 
 (defun bst-max2 (bst)
   (and bst
@@ -386,7 +394,7 @@
 ; node-chain: creating a list of nodes to target
 (defun node-chain (item root &optional chain)
   "Returns the node containing ITEM (if found) and the chain of nodes leading ot it"
-  (if root
+  (if root 
       (let ((key (key root))
             (lc (lc root))
             (rc (rc root))

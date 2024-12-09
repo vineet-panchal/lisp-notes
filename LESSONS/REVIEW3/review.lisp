@@ -1,5 +1,39 @@
 ; Part 8 - 13 Review
 
+; QUICKSORT
+; ==> O(n log n)
+; ==> pick an element to be the "pivot". The pivot represents a known value, where
+; ==> everything to the left of the pivot will be less than the pivot and
+; ==> everything to the right of the pivot will be greater than the pivot
+(defun quicksort (vec comp)
+; the function takes in two arguments: vec - the vector to be sorted
+; comp - an comparison function
+  (when (> (length vec) 1)
+  ; only continue when the vector has more than one element
+    (let ((ppvt 0) ; initialize ppvt to be the partition index, starting at 0
+          (pivot (aref vec (1- (length vec)))))
+          ; set pivot to be the last element in the vector
+      (dotimes (i (1- (length vec)))
+      ; loop over all the elements from the start of vec to the second-last index of vec
+        (when (funcall comp (aref vec i) pivot)
+        ; check the comparison between the element at i and the pivot element
+          (rotatef (aref vec i) (aref vec ppvt)) ; swap the two elements
+          (incf ppvt))) ; increment ppvt by 1
+      (rotatef (aref vec (1- (length vec))) (aref vec ppvt))
+      ; Finally, swap the pivot element (`vec[length - 1]`) with `vec[ppvt]`.
+      ; This places the pivot element in its correct sorted position within the vector.
+      (quicksort (rtl:slice vec 0 ppvt) comp)
+      ; Recursively apply `quicksort` to the left partition (all elements less than the pivot).
+      ; `rtl:slice` returns a subvector from index 0 to `ppvt - 1`.
+      (quicksort (rtl:slice vec (1+ ppvt)) comp)))
+      ; Recursively apply `quicksort` to the right partition (all elements greater than the pivot).
+      ; `rtl:slice` returns a subvector from `ppvt + 1` to the end of `vec`.
+  vec) ; return the sorted vector
+
+
+
+
+
 ; HASH TABLES & KEY-VALUE PAIRS
 
 ; Arrays
@@ -394,25 +428,25 @@
 ; node-chain: creating a list of nodes to target
 (defun node-chain (item root &optional chain)
   "Returns the node containing ITEM (if found) and the chain of nodes leading ot it"
-  (if root 
-      (let ((key (key root))
-            (lc (lc root))
-            (rc (rc root))
-            (chain (cons root chain)))
-        (cond ((< item key) (node-chain item lc chain))
-              ((> item key) (node-chain item rc chain))
-              (t (values root chain))))
-      (values nil chain)))
+  (if root ; if given root
+      (let ((key (key root)) ; let key be the key of the root
+            (lc (lc root)) ; let lc be the left child of the root
+            (rc (rc root)) ; let rc be the right child of the root
+            (chain (cons root chain))) ; let chain be the chain with the root at the start of the list
+        (cond ((< item key) (node-chain item lc chain)) ; if item is less than the key, recursively call with item lc and chain
+              ((> item key) (node-chain item rc chain)) ; if item is greater than the key, recursively call with item rc and chain
+              (t (values root chain)))) ; else 
+      (values nil chain))) ; return chain to be all nil
 
 ; splay: repeating tree-rotate until root
 (defun splay (node chain)
-  (loop :for (parent grandparent) :on chain :do
-    (tree-rotate node parent grandparent))
+  (loop :for (parent grandparent) :on chain :do ; loop through each parent and grandparent of chain 
+    (tree-rotate node parent grandparent)) ; tree-rotate node parent and grandparent
   node) ; return node once its at the top
 
 ; st-search: gets chain, splay does the rest
 (defun st-search (item root)
-  (multiple-value-bind (node chain) (node-chain item root)
+  (multiple-value-bind (node chain) (node-chain item root) 
     (when node (splay (car chain) (cdr chain)))))
 
 ; Inserting Into A Splay Tree
@@ -460,59 +494,59 @@
 ; 22 18 29
 
 ; Insertion, heap-push (max-heap)
-(defun hparent (i) (floor (- i 1) 2))
+(defun hparent (i) (floor (- i 1) 2)) ; getting the parent index
 
-(defun heap-push (node vec)
-  (vector-push-extend node vec)
-  (heap-up vec (1- (length vec))))
+(defun heap-push (node vec) ; push a new node into the heap 
+  (vector-push-extend node vec) ; put node at the end of vec
+  (heap-up vec (1- (length vec)))) ; call heap-up with the vector and index of the last element (node)
 
-(defun heap-up (vec i)
-  (when (and (> i 0) (> (aref vec i) (aref vec (hparent i))))
-    (rotatef (aref vec i) (aref vec (hparent i)))
-    (heap-up vec (hparent i)))
-  vec)
+(defun heap-up (vec i) 
+  (when (and (> i 0) (> (aref vec i) (aref vec (hparent i)))) ; when i is greater than 0 and node at i is greater than the parent of i
+    (rotatef (aref vec i) (aref vec (hparent i))) ; swap vector at i with vector at parent of i
+    (heap-up vec (hparent i))) ; recursively call heap-up with vector and the index of the parent
+  vec) ; return vector
 
 ; Deletion (heap-pop)
 (defun hrt (i) (* (+ i 1) 2)) ; gets index of the node's right child
 (defun hlt (i) (- (hrt i) 1)) ; gets index of node's left child (right - 1)
 
 (defun heap-pop (vec)
-  (rotatef (aref vec 0) (aref vec (- (length vec) 1)))
+  (rotatef (aref vec 0) (aref vec (- (length vec) 1))) ; swap vector at index 0 and the last element of the vector
   (prog1
-      (vector-pop vec)
-    (heap-down vec 0)))
+      (vector-pop vec) ; pop the last element
+    (heap-down vec 0))) ; call the function heap-down with the vector and position 0
 
 (defun heap-down (vec beg &optional (end (length vec)))
-  (let ((l (hlt beg))
-        (r (hrt beg)))
-    (when (< l end)
-      (let ((child
-              (if (or (>= r end)
-                      (> (aref vec l) (aref vec r)))
-                  l
-                  r)))
-        (when (> (aref vec child) (aref vec beg))
-          (rotatef (aref vec beg) (aref vec child))
-          (heap-down vec child end)))))
-  vec)
+  (let ((l (hlt beg)) ; let l be the index of the left child of the gibven index
+        (r (hrt beg))) ; let r be the index of the right child of the given index
+    (when (< l end) ; when l is less than the length of the vector
+      (let ((child ; let child be the 
+              (if (or (>= r end) ; if r is greater than or equal to end or
+                      (> (aref vec l) (aref vec r))) ; the left child is greater than the right child
+                  l ; return l
+                  r))) ; return r
+        (when (> (aref vec child) (aref vec beg)) ; when child element is greater than the element at the given index
+          (rotatef (aref vec beg) (aref vec child)) ; swap the element at the given index with the child element
+          (heap-down vec child end))))) ; recursively call heap-down with the vector, child, and end
+  vec) ; return the vector
 
 ; Heap Creation (heapify)
 (defun heapify (vec)
-  (let ((mid (floor (length vec) 2)))
-    (dotimes (i mid)
-      (heap-down vec (- mid i 1))))
-  vec)
+  (let ((mid (floor (length vec) 2))) ; let mid be the index of the middle element of the vector
+    (dotimes (i mid) ; loop from i to mid
+      (heap-down vec (- mid i 1)))) ; call heap-down function with the vector, and the index of the parent
+  vec) ; return the vector
 
-; Heapsort ==> O(log n) 
-; => take na existing vector and create a max-heap (heapify)
+; Heapsort ==> O(n log n) 
+; => take an existing vector and create a max-heap (heapify)
 ; => one at a time, rotate each node (starting with the leaves) to the top and perform a head down to propagate the biggest to the top
 ; => swap this with the next leaf to put the large number at the bottom. repeat.
 (defun heapsort (vec)
-  (heapify vec)
-  (dotimes (i (length vec))
-    (let ((last (- (length vec) i 1)))
-      (rotatef (aref vec 0) (aref vec last))
-      (heap-down vec 0 last)))
+  (heapify vec) ; first heapify vec
+  (dotimes (i (length vec)) ; loop throught i and the length of the vector
+    (let ((last (- (length vec) i 1))) ; let last be the index of the last element in the current array of the remaining elments
+      (rotatef (aref vec 0) (aref vec last)) ; swap the first element and the last element of the remaining elements
+      (heap-down vec 0 last))) ; 
   vec)
 
 
@@ -592,3 +626,73 @@
 ;    ==> insert in pq a pair (V weight) setting weight to be initially infinite
 ; 3. If V is S, assign 0 as the weight
 ; 4. Sort pq based on weight of each pair (V Weight) 
+
+
+
+
+
+
+(defstruct node id edges) ; node id and its list of outgoing edges
+(defstruct edge src dst label) ; let edge be an object with src node, dst node, and label/cost
+(defstruct (graph (:conc-name nil)) ; let graph object be made of
+  (nodes (make-hash-table))) ; nodes as a hash-table
+
+; RTL-USER> (defvar g (make-graph)) ; an empty graph
+; ==> G
+; RTL-USER> (setf (gethash 1 (nodes g)) (make-node :id 1)) ; adding node 1
+; ==> #S(NODE :ID 1 :EDGES NIL)
+; RTL-USER> (gethash 1 (nodes g))
+; ==> #S(NODE :ID 1 :EDGES NIL)
+; RTL-USER> (setf (gethash 2 (nodes g)) (make-node :id 2)) ; adding node 2
+; ==> #S(NODE :ID 2 :EDGES NIL)
+; RTL-USER> (push (make-edge :src 1 :dst 2 :label "a") ; adding edge 1->2 to the data structure
+;                 (node-edges (gethash 1 (nodes g))))
+; ==> (#S(EDGE :SRC 1 :DST 2 :LABEL "a"))
+; RTL-USER> (gethash 1 (nodes g)) ; node 1
+; ==> #S(NODE :ID 1 :EDGES (#S(EDGE :SRC 1 :DST 2 :LABEL "a")))
+; RTL-USER> (gethash 2 (nodes g)) ; node 2
+; ==> #S(NODE :ID 2 :EDGES NIL)
+
+(defun getset-# (key ht &optional new-val) ; key of the node, the hash table, and new-val to return the value
+  "Gets value from the hash-table (ht) if key already present,
+    otherwise sets the key to new-val in the hash table."
+  (let ((val (gethash key ht))) ; let val be be the value of the key in the hash table
+    (if val val ; if val is already present in the hash table
+        (setf (gethash key ht) new-val)))) ; set value to be new-val
+
+(defun init-graph (edges)
+  "Builds and returns a graph for the given list of edges."
+  (let* ((grph (make-graph)) ; let grph be a new graph
+         (nodes (nodes grph))) ; let nodes be the nodes of grph
+    (loop :for (src dst cost) :in edges ; loop for every src, dst, and cost in the list of edges
+          :do
+             (let ((src-node (getset-# src nodes (make-node :id src)))) ; let src-node be a new source node
+               (getset-# dst nodes (make-node :id dst)) ; creates dst node
+               (push (make-edge :src src :dst dst :label cost) ; creates and adds edge to the
+                     (node-edges src-node)))) ; list of edges of the src node
+    grph)) ; return grph 
+
+; RTL-USER> (init-graph '((1 2 a) (1 3 c) (3 2 a)))
+
+
+(defun get-node-ids (g &optional acc)
+  "returns the list of node ids in hash-table G"
+  (maphash #'(lambda (k v) (push k acc)) g)
+  acc)
+(defun pprint-graph (graph stream)
+  (let ((ids (sort (get-node-ids (nodes graph)) '<))
+        (format stream " ~{~@T~A~}~%" ids) ; prints items of list IDS separated by a tab
+        (dolist (id1 ids)
+          (let ((node (gethash id1 (nodes graph)))
+                (format stream "~A" id1)                                                                            
+                (dolist (id2 ids)
+                  (format stream "~@T~:[ ~;x~]" ; if the argument is non-nil prints "x"
+                          (find id2 (node-edges node) :key 'edge-dst)))
+                (terpri stream))))))) ; outputs a newline to output-stream.
+
+; CL-USER> (setf g (init-graph '((1 2 a) (1 3 c) (3 2 a))))
+; CL-USER> (pprint-graph g t)
+; ==>  1 2 3
+;    1   x x
+;    2
+;    3   x

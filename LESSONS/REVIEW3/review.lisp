@@ -677,8 +677,9 @@
 
 (defun get-node-ids (g &optional acc)
   "returns the list of node ids in hash-table G"
-  (maphash #'(lambda (k v) (push k acc)) g)
-  acc)
+  (maphash #'(lambda (k v) (push k acc)) g) 
+  acc) 
+
 (defun pprint-graph (graph stream)
   (let ((ids (sort (get-node-ids (nodes graph)) '<))
         (format stream " ~{~@T~A~}~%" ids) ; prints items of list IDS separated by a tab
